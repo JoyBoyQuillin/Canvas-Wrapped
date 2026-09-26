@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { computeWrapped, RANGES, type Range } from '@/lib/wrapped';
 import { timeAgo } from '@/lib/wrapped-slides';
 import { buildSlides, type SlideDef } from '@/components/wrapped/slides';
+import type { SlideId } from '@/lib/wrapped-copy';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import type { CarouselApi } from '@/components/ui/carousel';
@@ -12,6 +13,18 @@ import { useFullscreen, useIdle, useWrappedData } from './hooks';
 import LoadingScreen from './LoadingScreen';
 import NerdsSheet from './NerdsSheet';
 import WrappedCarousel from './WrappedCarousel';
+
+// Slides that play the same role in different ranges (week/month show page views instead of hours).
+const EQUIVALENT_SLIDES: Partial<Record<SlideId, SlideId>> = { hours: 'pageviews', pageviews: 'hours' };
+
+/** Where to open a (re)mounted carousel: same slide, else its equivalent, else the same position. */
+function resolveIndex(slides: SlideDef[], at: { id: SlideId; index: number }): number {
+  const find = (id: SlideId | undefined) => (id ? slides.findIndex((s) => s.id === id) : -1);
+  const i = find(at.id);
+  if (i >= 0) return i;
+  const j = find(EQUIVALENT_SLIDES[at.id]);
+  return j >= 0 ? j : Math.min(at.index, Math.max(slides.length - 1, 0));
+}
 
 const RANGE_LABELS: Record<Range, string> = { week: 'Week', month: 'Month', semester: 'Semester', all: 'All time' };
 
@@ -53,6 +66,18 @@ export default function App() {
   const slides = useMemo(() => (stats ? buildSlides(stats) : []), [stats]);
   const ready = !!stats;
   const immersive = ready && mode === 'immersive';
+
+  // The carousel remounts on shrink/expand and on range change; this keeps the viewer's place.
+  // Tracked by slide id because each range has a different set of slides.
+  const position = useRef<{ id: SlideId; index: number }>({ id: 'intro', index: 0 });
+  const startIndex = resolveIndex(slides, position.current);
+  const onIndexChange = useCallback(
+    (index: number) => {
+      const slide = slides[index];
+      if (slide) position.current = { id: slide.id, index };
+    },
+    [slides],
+  );
 
   const idle = useIdle(rootRef, 2500, open && immersive && !menu && !nerds);
   const fullscreen = useFullscreen(rootRef);
@@ -142,6 +167,8 @@ export default function App() {
                 controlsHidden={idle}
                 onApi={setApi}
                 onSlideContextMenu={onSlideContextMenu}
+                startIndex={startIndex}
+                onIndexChange={onIndexChange}
               />
               <div
                 className={cn(
@@ -207,7 +234,15 @@ export default function App() {
               <div className="min-h-0 overflow-y-auto p-4">
                 {body ?? (
                   <>
-                    <WrappedCarousel key={range} slides={slides} variant="panel" onApi={setApi} onSlideContextMenu={onSlideContextMenu} />
+                    <WrappedCarousel
+                      key={range}
+                      slides={slides}
+                      variant="panel"
+                      onApi={setApi}
+                      onSlideContextMenu={onSlideContextMenu}
+                      startIndex={startIndex}
+                      onIndexChange={onIndexChange}
+                    />
                     <p className="mt-3 text-center text-xs text-muted-foreground">
                       {updated} · Right-click a slide for stats for nerds
                     </p>
