@@ -86,7 +86,7 @@ export default function WrappedCarousel({ slides, variant, controlsHidden = fals
       className={cn(
         'w-full min-w-0 outline-none',
         immersive
-          ? 'h-full [&_[data-slot=carousel-content]]:h-full'
+          ? 'wrapped-immersive h-full min-h-0 [&_[data-slot=carousel-content]]:h-full'
           : 'rounded-2xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       )}
       aria-label="Your Canvas Wrapped slides"
@@ -94,16 +94,16 @@ export default function WrappedCarousel({ slides, variant, controlsHidden = fals
     >
       {segments}
 
-      <CarouselContent className={cn('touch-pan-y', immersive && 'ml-0 h-full')}>
+      <CarouselContent className={cn('touch-pan-y', immersive && 'ml-0 h-full min-h-0')}>
         {slides.map((slide, index) => (
           <CarouselItem
             key={slide.id}
-            className={cn('group/item flex', immersive && 'pl-0 [&_[data-slot=card]]:min-h-0 [&_[data-slot=card]]:rounded-none')}
+            className={cn('group/item flex', immersive && 'h-full min-h-0 pl-0 [&_[data-slot=card]]:min-h-0 [&_[data-slot=card]]:rounded-none')}
             data-active={index === current}
             aria-label={`${index + 1} of ${slides.length}: ${slide.title}`}
             aria-hidden={index !== current}
           >
-            <div className="w-full min-w-0" onContextMenu={onSlideContextMenu && ((e) => onSlideContextMenu(e, slide))}>
+            <div className={cn('w-full min-w-0', immersive && 'h-full min-h-0')} onContextMenu={onSlideContextMenu && ((e) => onSlideContextMenu(e, slide))}>
               {slide.content}
             </div>
           </CarouselItem>

@@ -4,6 +4,43 @@
    Avoid at-rule examples in comments: WXT also processes those. */
 
 /* Animations for the Wrapped loading screen and slide art. Use with motion-safe: */
+/* Measure the actual carousel height, including when browser fullscreen changes. */
+.wrapped-immersive {
+  container: wrapped-viewport / size;
+}
+
+/* Keep dense content reachable, with room above/below for the overlay controls. */
+.wrapped-immersive .wrapped-slide-body {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-top: max(6rem, 12cqh);
+  padding-bottom: max(4rem, 8cqh);
+}
+
+/* Width alone is not enough to choose presentation-sized typography. */
+@container wrapped-viewport (max-height: 850px) {
+  .wrapped-slide-grid {
+    gap: 1.5rem;
+    padding-top: 1rem;
+  }
+  .wrapped-slide-stack {
+    gap: clamp(0.75rem, 2cqh, 1.25rem);
+  }
+  .wrapped-headline {
+    font-size: clamp(1.75rem, 5cqh, 3rem);
+  }
+  .wrapped-title {
+    font-size: clamp(2.5rem, 9cqh, 5rem);
+  }
+  .wrapped-big-stat {
+    font-size: clamp(4rem, 13cqh, 7rem);
+  }
+  .wrapped-sub,
+  .wrapped-slide-quip {
+    font-size: clamp(1rem, 2.5cqh, 1.25rem);
+  }
+}
+
 @theme {
   --animate-equalizer: equalizer 1.1s ease-in-out infinite;
   --animate-float: float 7s ease-in-out infinite;
