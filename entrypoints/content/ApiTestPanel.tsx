@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { runApiTest, type ApiResult } from '@/lib/endpoints';
+import WrappedDemo from './WrappedDemo';
 
 const PREVIEW_LINES = 200;
 
@@ -74,6 +75,7 @@ function ResultRow({ r }: { r: ApiResult }) {
 
 export default function ApiTestPanel() {
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<'wrapped' | 'api'>('wrapped');
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<ApiResult[]>([]);
   const [total, setTotal] = useState(0);
@@ -109,18 +111,28 @@ export default function ApiTestPanel() {
   if (!open) {
     return (
       <button className="fab" onClick={() => setOpen(true)}>
-        Canvas Wrapped · API test
+        Canvas Wrapped
       </button>
     );
   }
 
   return (
+    <div className="backdrop" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
     <div className="panel" ref={setPanelEl}>
       <header>
-        <strong>Canvas Wrapped · API test</strong>
+        <div className="tabs">
+          <button className={tab === 'wrapped' ? 'active' : ''} onClick={() => setTab('wrapped')}>Wrapped</button>
+          <button className={tab === 'api' ? 'active' : ''} onClick={() => setTab('api')}>API test</button>
+        </div>
         <button className="icon" onClick={() => setOpen(false)} aria-label="Close">×</button>
       </header>
 
+      {/* Kept mounted so switching tabs doesn't throw away results. */}
+      <div style={{ display: tab === 'wrapped' ? 'contents' : 'none' }}>
+        <WrappedDemo />
+      </div>
+
+      {tab === 'api' && <>
       <div className="toolbar">
         <button className="primary" onClick={run} disabled={running}>
           {running ? 'Running…' : results.length ? 'Run again' : 'Run API test'}
@@ -159,6 +171,8 @@ export default function ApiTestPanel() {
           </p>
         )}
       </div>
+      </>}
+    </div>
     </div>
   );
 }
