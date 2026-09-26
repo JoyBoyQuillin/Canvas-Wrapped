@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "cn": "^0.4.0",
     "embla-carousel-react": "^8.6.0",
+    "embla-carousel-wheel-gestures": "^8.1.0",
     "lucide-react": "^1.48.0",
     "radix-ui": "^1.6.7",
     "react": "^19.2.4",

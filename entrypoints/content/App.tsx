@@ -98,6 +98,24 @@ export default function App() {
     if (open) rootRef.current?.focus();
   }, [open, immersive]);
 
+  // On Mac, an unused sideways trackpad swipe makes Chrome go back a page (e.g. swiping past the
+  // first slide). While Wrapped is open, swallow sideways swipes unless something inside can
+  // actually scroll sideways (like a wide table), so they only ever move slides.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!open || !root) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // mostly vertical: normal scrolling
+      for (const node of e.composedPath()) {
+        if (node === root) break;
+        if (node instanceof HTMLElement && node.scrollWidth > node.clientWidth && /auto|scroll/.test(getComputedStyle(node).overflowX)) return;
+      }
+      e.preventDefault();
+    };
+    root.addEventListener('wheel', onWheel, { passive: false });
+    return () => root.removeEventListener('wheel', onWheel);
+  }, [open, everOpened]);
+
   const close = useCallback(() => {
     if (document.fullscreenElement) void document.exitFullscreen();
     setOpen(false);
