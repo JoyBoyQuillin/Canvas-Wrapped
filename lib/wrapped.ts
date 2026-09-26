@@ -27,11 +27,13 @@ export interface RawEnrollment {
 export interface RawSubmission {
   submitted_at: string | null;
   cached_due_date: string | null;
-  score: number | null;
+  score: number | string | null;
   late: boolean;
   attempt: number | null;
   submission_type: string | null;
   excused?: boolean | null;
+  grade?: string | null;
+  workflow_state?: string | null;
   assignment?: { name: string; course_id: number; points_possible: number | null };
 }
 
@@ -298,8 +300,39 @@ export function computeWrapped(input: WrappedInput, range: Range = 'all', now: n
   }
   const totalPageViews = sum(hourTotals);
 
-  const percentOf = (s: RawSubmission) =>
-    s.score !== null && s.assignment?.points_possible ? (s.score / s.assignment.points_possible) * 100 : null;
+  const percentOf = (s: RawSubmission): number | null => {
+    const pointsPossible = s.assignment?.points_possible;
+    const numPoints = Number(pointsPossible);
+    if (pointsPossible === null || pointsPossible === undefined || !Number.isFinite(numPoints) || numPoints <= 0) {
+      const gradeState = String(s.grade ?? s.workflow_state ?? '').trim().toLowerCase();
+      if (gradeState === 'complete' || gradeState === 'checkmark' || gradeState === 'pass' || gradeState === '✓') return 100;
+      if (gradeState === 'incomplete' || gradeState === 'missing' || gradeState === 'x' || gradeState === 'not submitted' || gradeState === 'unsubmitted') return 0;
+      if (gradeState === 'excused' || gradeState === 'ex' || gradeState === 'not_submitted') return null;
+      return null;
+    }
+
+    const rawScore = s.score;
+    if (rawScore === null || rawScore === undefined) {
+      const gradeState = String(s.grade ?? s.workflow_state ?? '').trim().toLowerCase();
+      if (gradeState === 'complete' || gradeState === 'checkmark' || gradeState === 'pass' || gradeState === '✓') return 100;
+      if (gradeState === 'incomplete' || gradeState === 'missing' || gradeState === 'x' || gradeState === 'not submitted' || gradeState === 'unsubmitted') return 0;
+      if (gradeState === 'excused' || gradeState === 'ex' || gradeState === 'not_submitted') return null;
+      return null;
+    }
+
+    if (typeof rawScore === 'string') {
+      const normalized = rawScore.trim().toLowerCase();
+      if (normalized === 'complete' || normalized === 'checkmark' || normalized === 'pass' || normalized === '✓') return 100;
+      if (normalized === 'incomplete' || normalized === 'missing' || normalized === 'x' || normalized === 'not submitted' || normalized === 'unsubmitted') return 0;
+      if (normalized === 'excused' || normalized === 'ex' || normalized === 'not_submitted') return null;
+      const numeric = Number(rawScore);
+      if (!Number.isFinite(numeric)) return null;
+      return (numeric / numPoints) * 100;
+    }
+
+    if (!Number.isFinite(rawScore)) return null;
+    return (rawScore / numPoints) * 100;
+  };
 
   // Per-course rollup
   const gradeMode = windowDays ? 'recent' : 'current';

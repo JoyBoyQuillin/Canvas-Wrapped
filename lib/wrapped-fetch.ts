@@ -32,7 +32,8 @@ const trimEnrollment = (e: RawEnrollment): RawEnrollment => ({
 });
 const trimSubmission = (s: RawSubmission): RawSubmission => ({
   submitted_at: s.submitted_at, cached_due_date: s.cached_due_date, score: s.score, late: s.late,
-  attempt: s.attempt, submission_type: s.submission_type, excused: s.excused,
+  attempt: s.attempt, submission_type: s.submission_type, excused: s.excused, grade: s.grade,
+  workflow_state: s.workflow_state,
   assignment: s.assignment && {
     name: s.assignment.name, course_id: s.assignment.course_id, points_possible: s.assignment.points_possible,
   },
