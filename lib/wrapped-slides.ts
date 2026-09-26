@@ -2,11 +2,11 @@
 
 import type { WrappedStats } from './wrapped';
 
-const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-const fmtHour = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`;
-const pct = (n: number) => `${Math.round(n * 100)}%`;
+export const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+export const fmtHour = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`;
+export const pct = (n: number) => `${Math.round(n * 100)}%`;
 
-function fmtDuration(minutes: number): string {
+export function fmtDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} minutes`;
   const h = Math.floor(minutes / 60);
   return `${h}h ${minutes % 60}m`;

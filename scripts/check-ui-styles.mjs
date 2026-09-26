@@ -35,11 +35,11 @@ const { shadowCss, documentCss } = splitShadowRootCss(css);
 // Regressions here can leave a working React button with no visible styling.
 assert.equal((shadowCss.match(/\/\*/g) || []).length, (shadowCss.match(/\*\//g) || []).length);
 assert.match(shadowCss, /--primary:\s*#2563eb/);
-assert.match(shadowCss, /\.bg-primary\s*\{\s*background-color:\s*var\(--primary\)/);
+assert.match(shadowCss, /\.bg-primary[,\s][^{]*\{\s*background-color:\s*var\(--primary\)/); // may share a rule with .bg-primary/20
 assert.match(shadowCss, /\.fixed\s*\{\s*position:\s*fixed/);
 assert.match(shadowCss, /\.right-4/);
 assert.match(shadowCss, /:host/);
-assert.match(shadowCss, /--cw-accent/);
+assert.match(shadowCss, /\.bg-linear-to-br/); // Wrapped slide gradients
 assert.ok(!shadowCss.includes('@property'));
 assert.match(documentCss, /@property/);
 console.log('PASS: Compiled UI styles survive WXT shadow-root processing.');
