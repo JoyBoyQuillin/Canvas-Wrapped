@@ -1,2 +1,3 @@
-# Canvas-wrapped-Shellhacks-2026-
-fart
+# WXT + React
+
+This template should help get you started developing with React in WXT.
