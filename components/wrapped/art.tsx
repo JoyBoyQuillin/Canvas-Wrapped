@@ -1,7 +1,7 @@
 // Slide illustrations and small charts. All inline SVG/CSS (no image files), white-on-gradient,
 // and every animation is motion-safe so reduced-motion users get a still picture.
 
-import { useId, type CSSProperties } from 'react';
+import { useEffect, useId, useState, type CSSProperties } from 'react';
 import { Flame, Ghost, Hourglass, Moon, Repeat, Sparkles, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClockArchetype, DeadlineArchetype } from '@/lib/archetypes';
@@ -154,7 +154,37 @@ export const TrophyArt = () => <IconArt icon={Trophy} />;
 export const RepeatArt = () => <IconArt icon={Repeat} className="motion-safe:animate-spin [animation-duration:6s]" />;
 export const QuietArt = () => <IconArt icon={Moon} />;
 
-/** Spotify-ish equalizer bars. */
+const LIVE_BARS_START = [0.55, 0.8, 0.4, 0.95, 0.65, 0.75];
+
+/**
+ * A bar chart whose values update about once a second, like a live dashboard refreshing.
+ * Bars ease to their new heights; reduced-motion users get a still chart.
+ */
+export function LiveBars({ className }: { className?: string }) {
+  const [values, setValues] = useState(LIVE_BARS_START);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => setValues((v) => v.map(() => 0.2 + Math.random() * 0.8)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className={cn('relative flex h-44 w-72 items-end gap-3 border-b-2 border-l-2 border-white/60 pl-3', className)} aria-hidden>
+      {/* Faint gridlines, so it reads as a chart rather than a visualizer */}
+      {[0.25, 0.5, 0.75].map((y) => (
+        <div key={y} className="absolute inset-x-0 border-t border-white/15" style={{ bottom: `${y * 100}%` }} />
+      ))}
+      {values.map((v, i) => (
+        <div
+          key={i}
+          className="relative flex-1 rounded-t-sm bg-white transition-[height] duration-700 ease-out"
+          style={{ height: `${v * 100}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Spotify-ish equalizer bars (loading screen). */
 export function Equalizer({ className }: { className?: string }) {
   return (
     <div className={cn('flex h-40 items-end gap-3', className)} aria-hidden>

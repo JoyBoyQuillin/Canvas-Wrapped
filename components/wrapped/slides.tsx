@@ -5,7 +5,7 @@ import { DAYS, type WrappedStats } from '@/lib/wrapped';
 import { period, quip, slidePlan, type SlideId } from '@/lib/wrapped-copy';
 import { fmtDate, fmtDuration, fmtHour, pct } from '@/lib/wrapped-slides';
 import {
-  Bubbles, CLOCK_THEME, ClockArt, DEADLINE_THEME, DeadlineArt, Donut, Equalizer, GradeRing, QuietArt,
+  Bubbles, CLOCK_THEME, ClockArt, DEADLINE_THEME, DeadlineArt, Donut, GradeRing, LiveBars, QuietArt,
   RepeatArt, StackedBar, TrophyArt, Waffle,
 } from './art';
 import { BarList, BigStat, Callout, Headline, MiniStat, Slide, Sub, Tag, Title } from './primitives';
@@ -67,7 +67,7 @@ export function buildSlides(w: WrappedStats): SlideDef[] {
       title: 'Welcome',
       data: { range: w.range, terms: w.terms, dateRange: w.dateRange },
       content: (
-        <Slide theme="violet" eyebrow={`Canvas Wrapped · ${w.rangeLabel}`} art={<Equalizer />} quip={q('intro')}>
+        <Slide theme="violet" eyebrow={`Canvas Wrapped · ${w.rangeLabel}`} art={<LiveBars />} quip={q('intro')}>
           <p className="text-lg font-medium text-white/80 @4xl/slide:text-3xl">Hey {w.firstName},</p>
           <h2 className="text-5xl leading-[1.05] font-black tracking-tight @4xl/slide:text-9xl">
             {w.range === 'week' ? 'Your week,' : w.range === 'month' ? 'Your month,' : w.range === 'semester' ? 'Your semester,' : 'Your Canvas,'}
