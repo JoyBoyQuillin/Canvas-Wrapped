@@ -35,7 +35,9 @@ the panel and check the Wrapped/API tabs. The popup is a separate extension page
 pnpm dlx shadcn@latest add card
 ```
 
-The CLI reads `components.json` and writes into `components/ui`.
+The CLI reads `components.json` and writes into `components/ui`. It resolves the `@/`
+alias from the root `tsconfig.json`, which repeats WXT's aliases relative to the project
+root; without that, it writes components to the folder *above* the repo.
 Review the generated diff, including any shared stylesheet changes.
 Start with non-portal components such as Card or Badge.
 
@@ -56,8 +58,8 @@ The content entrypoint imports its stylesheet with `?inline` and passes the comp
 CSS to `createShadowRootUi({ css: styles })`. Theme tokens are declared on both
 `:root` (popup) and `:host` (Canvas shadow root).
 
-The old panel CSS is in the `components` layer so Tailwind utilities can override
-it. Its variables use `--cw-` names to avoid colliding with shadcn theme tokens.
+The content UI is all Tailwind + shadcn; `entrypoints/content/style.css` only imports
+the shared theme. Wrapped slide building blocks live in `components/wrapped/`.
 
 Avoid literal CSS at-rule examples in CSS comments: WXT's extraction logic can
 misinterpret them. WXT moves actual property registrations into document styles
@@ -68,7 +70,7 @@ while keeping UI selectors inside the shadow root.
 Before using a portal-based component in Canvas, adapt its Portal to receive an
 HTMLElement inside the same shadow root through its `container` prop. Otherwise
 it can render under Canvas's `document.body` without the extension styles.
-Button, Card, and Carousel are installed; portal components still need that wiring
+Button, Card, Carousel, Tabs, Badge, Progress, Table, Skeleton, and Alert are installed; portal components still need that wiring
 and keyboard/focus testing when added.
 
 ## Checks

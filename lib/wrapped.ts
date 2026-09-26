@@ -101,11 +101,13 @@ export interface WrappedStats {
     peakHour: number | null; // 0–23, local to the student's Canvas timezone
     peakDay: string | null;
     persona: string;
+    byHour: number[]; // 24 page-view totals, index = hour
+    byDay: number[]; // 7 page-view totals, index 0 = Sunday
   };
   messages: { threads: number; received: number; sent: number };
 }
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const SUBMISSION_TYPE_LABELS: Record<string, string> = {
   online_quiz: 'Quizzes',
@@ -304,7 +306,7 @@ export function computeWrapped(input: WrappedInput): WrappedStats {
       persona: deadlinePersona(medianHoursEarly),
     },
     redo: redoSub && { ...named(redoSub), attempts: redoSub.attempt! },
-    clock: { totalPageViews, peakHour, peakDay, persona: clockPersona(peakHour) },
+    clock: { totalPageViews, peakHour, peakDay, persona: clockPersona(peakHour), byHour: hourTotals, byDay: dayTotals },
     messages: {
       threads: input.inbox.length,
       received: input.inbox.reduce((a, c) => a + c.message_count, 0),

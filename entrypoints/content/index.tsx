@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client';
-import ApiTestPanel from './ApiTestPanel';
+import App from './App';
 import styles from './style.css?inline';
 
 export default defineContentScript({
@@ -9,7 +9,7 @@ export default defineContentScript({
 
   async main(ctx) {
     const ui = await createShadowRootUi(ctx, {
-      name: 'canvas-wrapped-api-test',
+      name: 'canvas-wrapped',
       // Bundle styles with the UI so a failed stylesheet fetch cannot leave it unstyled.
       css: styles,
       position: 'inline',
@@ -17,7 +17,7 @@ export default defineContentScript({
       isolateEvents: true,
       onMount(container) {
         const root = ReactDOM.createRoot(container);
-        root.render(<ApiTestPanel />);
+        root.render(<App />);
         return root;
       },
       onRemove(root) {
