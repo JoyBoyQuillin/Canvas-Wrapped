@@ -1,4 +1,4 @@
-/* Plain CSS (not Tailwind): Tailwind v4 relies on @property, which is ignored inside shadow roots. */
+/* Plain CSS for the shadow-root UI. Avoid at-rule examples in comments: WXT also processes those. */
 
 :host {
   --bg: #ffffff;
@@ -44,7 +44,7 @@ button:disabled {
 .fab {
   right: 16px;
   bottom: 16px;
-  background: var(--accent);
+  background: #2563eb;
   color: #fff;
   border: none;
   border-radius: 999px;
