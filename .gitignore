@@ -24,3 +24,7 @@ web-ext.config.ts
 *.njsproj
 *.sln
 *.sw?
+
+# Canvas API dumps (contain real grades/messages — never commit)
+fixtures/
+canvas-dump-*.json

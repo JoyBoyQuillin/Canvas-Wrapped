@@ -9,7 +9,7 @@ export default defineConfig({
   }),
   manifest: {
     // Intentionally scoped to one school (FIU) for now. To support more schools,
-    // add more domain strings here AND to the `matches` array in entrypoints/content.ts.
+    // add more domain strings here AND to the `matches` array in entrypoints/content/index.tsx.
     host_permissions: ['https://fiu.instructure.com/*'],
   },
 });
