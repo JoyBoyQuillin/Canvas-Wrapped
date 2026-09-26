@@ -14,7 +14,9 @@ When you suggest changes:
 - Only use data listed in **Available data** below. Anything else would need a new
   Canvas API call and is out of scope unless we ask.
 - Keep the output format: each archetype function takes numbers from `WrappedStats` and
-  returns a `string` label. It must handle `null` (missing data) explicitly.
+  returns a stable **id** (e.g. `'night-owl'`). It must handle `null` (missing data) explicitly.
+  Display labels and personality lines live in a separate record keyed by id (see code below),
+  so renaming a label never breaks the slide art and colors, which are keyed by id.
 - Every branch must be reachable and together they must cover every input (no gaps, no overlaps).
 - Return (1) an updated Mermaid flowchart, (2) an updated rules table, and (3) the TypeScript
   function, in the same style as the code excerpts below.
@@ -28,8 +30,8 @@ When you suggest changes:
 flowchart LR
   A[Canvas API data] --> B["computeWrapped()<br/>lib/wrapped.ts"]
   B --> C[WrappedStats]
-  C --> D["deadlinePersona()<br/>Axis 1: Deadlines"]
-  C --> E["clockPersona()<br/>Axis 2: Study clock"]
+  C --> D["deadlineArchetype()<br/>Axis 1: Deadlines"]
+  C --> E["clockArchetype()<br/>Axis 2: Study clock"]
   C --> F["Redo award<br/>(conditional badge)"]
   D --> G["Slides<br/>components/wrapped/slides.tsx"]
   E --> G
@@ -39,6 +41,13 @@ flowchart LR
 There are currently **two archetype axes** (each student gets exactly one label per axis)
 plus **one conditional award**. The axes are independent, so there are 4 × 5 = 20 possible
 combinations. The combinations don't get their own label yet (see ideas at the end).
+
+Rules, labels and lines all live in `lib/archetypes.ts`.
+
+**Archetypes are computed per time range.** The Wrapped has Week / Month / Semester / All-time
+views, and each view recomputes the stats from only that range's data, so a student can be a
+Night Owl this week and a Daytime Grinder over the semester. Copy that refers to time should
+use the range (the slides say "this week", "this semester", ...).
 
 ---
 
@@ -62,22 +71,33 @@ flowchart TD
   Q2 -- no --> P3[/"Certified Planner"/]
 ```
 
-| Archetype | Rule | Plain English |
+| Archetype (id) | Rule | Plain English |
 |---|---|---|
-| Mystery Submitter | `median === null` | We couldn't find any submissions with due dates |
-| Deadline Daredevil | `median < 6` | Usually submits in the last 6 hours, or late |
-| Just-in-Time Finisher | `6 ≤ median < 48` | Usually submits within the last 2 days |
-| Certified Planner | `median ≥ 48` | Usually submits 2+ days early |
+| Mystery Submitter (`mystery`) | `median === null` | We couldn't find any submissions with due dates |
+| Deadline Daredevil (`daredevil`) | `median < 6` | Usually submits in the last 6 hours, or late |
+| Just-in-Time Finisher (`just-in-time`) | `6 ≤ median < 48` | Usually submits within the last 2 days |
+| Certified Planner (`planner`) | `median ≥ 48` | Usually submits 2+ days early |
 
 **Current code:**
 
 ```ts
-function deadlinePersona(medianHours: number | null): string {
-  if (medianHours === null) return 'Mystery Submitter';
-  if (medianHours < 6) return 'Deadline Daredevil';
-  if (medianHours < 48) return 'Just-in-Time Finisher';
-  return 'Certified Planner';
+export type DeadlineArchetype = 'mystery' | 'daredevil' | 'just-in-time' | 'planner';
+
+export function deadlineArchetype(medianHoursEarly: number | null): DeadlineArchetype {
+  if (medianHoursEarly === null) return 'mystery';
+  if (medianHoursEarly < 6) return 'daredevil';
+  if (medianHoursEarly < 48) return 'just-in-time';
+  return 'planner';
 }
+
+// Label + personality lines (one line is picked per student and shown on the slide)
+export const DEADLINE_ARCHETYPES: Record<DeadlineArchetype, { label: string; lines: string[] }> = {
+  daredevil: {
+    label: 'Deadline Daredevil',
+    lines: ['Pressure makes diamonds, and you are very, very shiny.', /* ... */],
+  },
+  // ...one entry per id
+};
 ```
 
 **Caveats for tuning:**
@@ -111,25 +131,31 @@ flowchart TD
   Q3 -- no --> P4[/"Night Owl<br/>10pm–4:59am"/]
 ```
 
-| Archetype | Rule | Time window |
+| Archetype (id) | Rule | Time window |
 |---|---|---|
-| Ghost | `peakHour === null` | No activity data |
-| Early Bird | `5 ≤ h < 11` | 5:00am – 10:59am |
-| Daytime Grinder | `11 ≤ h < 17` | 11:00am – 4:59pm |
-| Evening Scholar | `17 ≤ h < 22` | 5:00pm – 9:59pm |
-| Night Owl | otherwise (`h ≥ 22` or `h < 5`) | 10:00pm – 4:59am |
+| Ghost (`ghost`) | `peakHour === null` | No activity data |
+| Early Bird (`early-bird`) | `5 ≤ h < 11` | 5:00am – 10:59am |
+| Daytime Grinder (`daytime`) | `11 ≤ h < 17` | 11:00am – 4:59pm |
+| Evening Scholar (`evening`) | `17 ≤ h < 22` | 5:00pm – 9:59pm |
+| Night Owl (`night-owl`) | otherwise (`h ≥ 22` or `h < 5`) | 10:00pm – 4:59am |
 
 **Current code:**
 
 ```ts
-function clockPersona(peakHour: number | null): string {
-  if (peakHour === null) return 'Ghost';
-  if (peakHour >= 5 && peakHour < 11) return 'Early Bird';
-  if (peakHour >= 11 && peakHour < 17) return 'Daytime Grinder';
-  if (peakHour >= 17 && peakHour < 22) return 'Evening Scholar';
-  return 'Night Owl';
+export type ClockArchetype = 'ghost' | 'early-bird' | 'daytime' | 'evening' | 'night-owl';
+
+export function clockArchetype(peakHour: number | null): ClockArchetype {
+  if (peakHour === null) return 'ghost';
+  if (peakHour >= 5 && peakHour < 11) return 'early-bird';
+  if (peakHour >= 11 && peakHour < 17) return 'daytime';
+  if (peakHour >= 17 && peakHour < 22) return 'evening';
+  return 'night-owl';
 }
+// Labels and lines: CLOCK_ARCHETYPES, same shape as DEADLINE_ARCHETYPES.
 ```
+
+Each clock archetype also has its own slide color and illustration (e.g. Night Owl = moon and
+twinkling stars on a night gradient, Early Bird = sunrise), keyed by id in `components/wrapped/art.tsx`.
 
 **Caveats for tuning:**
 
@@ -165,7 +191,7 @@ Constants: `MIN_REDO_ATTEMPTS = 3`, `AUTO_SYNC_TYPES = {'external_tool', 'basic_
 
 | Slide | Shown when | Uses |
 |---|---|---|
-| Deadline personality | always | Axis 1 label, median hours, closest call, most prepared |
+| Deadline personality | the range has submissions with due dates | Axis 1 label, median hours, closest call, most prepared |
 | Study clock | `clock.totalPageViews > 0` | Axis 2 label, peak hour, peak day, hourly chart |
 | Never give up | a redo award exists | award assignment, course, attempts |
 | Recap (last slide) | always | Axis 1 and Axis 2 labels in a grid |
@@ -205,14 +231,14 @@ interface WrappedStats {
     medianHoursEarly: number | null;
     closestCall: { assignment: string; course: string; minutesBefore: number } | null;
     earliest: { assignment: string; course: string; daysBefore: number } | null;
-    persona: string;                   // Axis 1
+    archetype: DeadlineArchetype;      // Axis 1 id
   };
   redo: { assignment: string; course: string; attempts: number } | null;
   clock: {
     totalPageViews: number;
     peakHour: number | null;           // 0–23
     peakDay: string | null;            // "Monday"…
-    persona: string;                   // Axis 2
+    archetype: ClockArchetype;         // Axis 2 id
     byHour: number[];                  // 24 page-view totals
     byDay: number[];                   // 7 totals, index 0 = Sunday
   };
@@ -239,6 +265,9 @@ interface WrappedStats {
 
 ## Files to edit
 
-- `lib/wrapped.ts`: `deadlinePersona()`, `clockPersona()`, `MIN_REDO_ATTEMPTS`, `AUTO_SYNC_TYPES`
-- `components/wrapped/slides.tsx`: how each label is displayed
-- `lib/wrapped-slides.ts`: plain-text version used by `node scripts/wrapped-demo.ts`
+- `lib/archetypes.ts`: archetype rules, labels, and personality lines (start here)
+- `lib/wrapped.ts`: the stats themselves, plus `MIN_REDO_ATTEMPTS` and `AUTO_SYNC_TYPES`
+- `lib/wrapped-copy.ts`: which slides show, and the personality line on every other slide
+- `components/wrapped/art.tsx`: per-archetype colors (`DEADLINE_THEME`, `CLOCK_THEME`) and illustrations
+- `components/wrapped/slides.tsx`: slide layouts
+- Check changes with `node scripts/wrapped-demo.ts --range=week|month|semester|all`

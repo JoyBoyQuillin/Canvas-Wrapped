@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { prefetchWrapped } from '@/lib/wrapped-cache';
 import styles from './style.css?inline';
 
 export default defineContentScript({
@@ -8,6 +9,9 @@ export default defineContentScript({
   matches: ['https://fiu.instructure.com/*'],
 
   async main(ctx) {
+    // Warm the cache in the background so Wrapped opens instantly.
+    void prefetchWrapped();
+
     const ui = await createShadowRootUi(ctx, {
       name: 'canvas-wrapped',
       // Bundle styles with the UI so a failed stylesheet fetch cannot leave it unstyled.
