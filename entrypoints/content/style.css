@@ -1,16 +1,19 @@
+@import "../../assets/styles/globals.css";
+
+@layer components {
 /* Plain CSS for the shadow-root UI. Avoid at-rule examples in comments: WXT also processes those. */
 
 :host {
-  --bg: #ffffff;
-  --fg: #1f2937;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --accent: #7c3aed;
-  --ok: #047857;
-  --ok-bg: #d1fae5;
-  --err: #b91c1c;
-  --err-bg: #fee2e2;
-  --code-bg: #f9fafb;
+  --cw-bg: #ffffff;
+  --cw-fg: #1f2937;
+  --cw-muted: #6b7280;
+  --cw-border: #e5e7eb;
+  --cw-accent: #7c3aed;
+  --cw-ok: #047857;
+  --cw-ok-bg: #d1fae5;
+  --cw-err: #b91c1c;
+  --cw-err-bg: #fee2e2;
+  --cw-code-bg: #f9fafb;
 }
 
 * {
@@ -20,9 +23,9 @@
 button {
   font: inherit;
   cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--fg);
+  border: 1px solid var(--cw-border);
+  background: var(--cw-bg);
+  color: var(--cw-fg);
   border-radius: 6px;
   padding: 6px 12px;
 }
@@ -32,25 +35,12 @@ button:disabled {
   cursor: default;
 }
 
-.fab,
 .backdrop {
   position: fixed;
   z-index: 2147483647;
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
-  color: var(--fg);
-}
-
-.fab {
-  right: 16px;
-  bottom: 16px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-weight: 600;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+  color: var(--cw-fg);
 }
 
 /* Full-viewport overlay so Canvas's fixed nav and sidebars can't overlap the panel. */
@@ -69,8 +59,8 @@ button:disabled {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--cw-bg);
+  border: 1px solid var(--cw-border);
   border-radius: 10px;
   box-shadow: 0 10px 40px rgb(0 0 0 / 0.25);
 }
@@ -80,7 +70,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--cw-border);
 }
 
 .icon {
@@ -97,20 +87,20 @@ header {
 }
 
 .primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--cw-accent);
+  border-color: var(--cw-accent);
   color: #fff;
   font-weight: 600;
 }
 
 .progress {
   padding: 0 14px 10px;
-  color: var(--muted);
+  color: var(--cw-muted);
 }
 
 .bar {
   height: 4px;
-  background: var(--border);
+  background: var(--cw-border);
   border-radius: 2px;
   margin-bottom: 4px;
   overflow: hidden;
@@ -118,7 +108,7 @@ header {
 
 .bar > div {
   height: 100%;
-  background: var(--accent);
+  background: var(--cw-accent);
   transition: width 0.2s;
 }
 
@@ -132,7 +122,7 @@ h3 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--muted);
+  color: var(--cw-muted);
   margin: 14px 0 4px;
 }
 
@@ -144,14 +134,14 @@ table {
 th {
   text-align: left;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--cw-muted);
   padding: 4px 6px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--cw-border);
 }
 
 td {
   padding: 4px 6px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--cw-border);
   vertical-align: top;
 }
 
@@ -166,7 +156,7 @@ td {
 }
 
 .row:hover {
-  background: var(--code-bg);
+  background: var(--cw-code-bg);
 }
 
 .label {
@@ -184,29 +174,29 @@ td {
 }
 
 .badge.ok {
-  color: var(--ok);
-  background: var(--ok-bg);
+  color: var(--cw-ok);
+  background: var(--cw-ok-bg);
 }
 
 .badge.err {
-  color: var(--err);
-  background: var(--err-bg);
+  color: var(--cw-err);
+  background: var(--cw-err-bg);
 }
 
 .detail {
-  background: var(--code-bg);
+  background: var(--cw-code-bg);
 }
 
 .path {
   font-family: ui-monospace, monospace;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--cw-muted);
   word-break: break-all;
   margin-bottom: 4px;
 }
 
 .error {
-  color: var(--err);
+  color: var(--cw-err);
   margin-bottom: 4px;
 }
 
@@ -229,7 +219,7 @@ td {
 
 details {
   margin-top: 14px;
-  color: var(--muted);
+  color: var(--cw-muted);
 }
 
 .tabs {
@@ -243,19 +233,20 @@ details {
 }
 
 .tabs button.active {
-  background: var(--code-bg);
-  color: var(--accent);
+  background: var(--cw-code-bg);
+  color: var(--cw-accent);
   font-weight: 600;
 }
 
 .link {
   border: none;
   background: none;
-  color: var(--accent);
+  color: var(--cw-accent);
   padding: 4px 0;
 }
 
 .empty {
-  color: var(--muted);
+  color: var(--cw-muted);
   margin: 4px 0 0;
+}
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { runApiTest, type ApiResult } from '@/lib/endpoints';
 import WrappedDemo from './WrappedDemo';
 
@@ -110,9 +111,9 @@ export default function ApiTestPanel() {
 
   if (!open) {
     return (
-      <button className="fab" onClick={() => setOpen(true)}>
+      <Button className="fixed right-4 bottom-4 z-[2147483647] rounded-full font-sans shadow-md" onClick={() => setOpen(true)}>
         Canvas Wrapped
-      </button>
+      </Button>
     );
   }
 

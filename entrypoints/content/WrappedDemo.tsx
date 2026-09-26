@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { computeWrapped, type WrappedStats } from '@/lib/wrapped';
 import { fetchWrappedInput } from '@/lib/wrapped-fetch';
 import { wrappedSlides } from '@/lib/wrapped-slides';
+import WrappedCarousel from './WrappedCarousel';
 
 type Status = { kind: 'idle' } | { kind: 'loading' } | { kind: 'done'; stats: WrappedStats; ms: number } | { kind: 'error'; message: string };
 
-/** Text-only Wrapped from live Canvas data, to check the numbers before the real slide UI. */
+/** Wrapped cards built from live Canvas data and the shared slide formatter. */
 export default function WrappedDemo() {
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
@@ -39,12 +40,7 @@ export default function WrappedDemo() {
         {status.kind === 'done' && (
           <>
             <p className="empty">Fetched and computed in {(status.ms / 1000).toFixed(1)}s.</p>
-            {wrappedSlides(status.stats).map((lines, i) => (
-              <section key={i}>
-                <h3>Slide {i + 1}</h3>
-                <pre className="slide">{lines.join('\n')}</pre>
-              </section>
-            ))}
+            <WrappedCarousel slides={wrappedSlides(status.stats)} />
             <details>
               <summary>Raw stats</summary>
               <div className="json"><pre>{JSON.stringify(status.stats, null, 2)}</pre></div>

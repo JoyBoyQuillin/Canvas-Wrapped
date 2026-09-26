@@ -1,5 +1,4 @@
-// Wrapped as plain-text slides. Shared by the in-page panel and scripts/wrapped-demo.ts
-// until the real slide UI exists.
+// Slide content shared by the in-page card carousel and scripts/wrapped-demo.ts.
 
 import type { WrappedStats } from './wrapped';
 
