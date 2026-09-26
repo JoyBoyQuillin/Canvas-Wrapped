@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { cn } from '@/lib/utils';
 import type { SlideDef } from '@/components/wrapped/slides';
 import {
@@ -16,22 +16,36 @@ interface Props {
   controlsHidden?: boolean; // immersive: fade arrows/counter while idle
   onApi?: (api: CarouselApi) => void;
   onSlideContextMenu?: (e: MouseEvent, slide: SlideDef) => void;
+  startIndex?: number; // slide to open on; read once when the carousel mounts
+  onIndexChange?: (index: number) => void;
 }
 
-export default function WrappedCarousel({ slides, variant, controlsHidden = false, onApi, onSlideContextMenu }: Props) {
+export default function WrappedCarousel({
+  slides, variant, controlsHidden = false, onApi, onSlideContextMenu, startIndex = 0, onIndexChange,
+}: Props) {
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
+  // Frozen at mount: if it tracked the live position, Embla would re-init (and jump) on every swipe.
+  const [initialIndex] = useState(() => Math.min(Math.max(startIndex, 0), Math.max(slides.length - 1, 0)));
+  const [current, setCurrent] = useState(initialIndex);
   const immersive = variant === 'immersive';
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
 
   useEffect(() => {
     if (!api) return;
     onApi?.(api);
     const updateCurrent = () => setCurrent(api.selectedScrollSnap());
+    // Only real navigation is reported, not mount/re-init, so landing on a fallback slide
+    // doesn't overwrite where the viewer actually was.
+    const onSelect = () => {
+      updateCurrent();
+      onIndexChangeRef.current?.(api.selectedScrollSnap());
+    };
     updateCurrent();
-    api.on('select', updateCurrent);
+    api.on('select', onSelect);
     api.on('reInit', updateCurrent);
     return () => {
-      api.off('select', updateCurrent);
+      api.off('select', onSelect);
       api.off('reInit', updateCurrent);
     };
   }, [api, onApi]);
@@ -80,6 +94,7 @@ export default function WrappedCarousel({ slides, variant, controlsHidden = fals
       setApi={setApi}
       opts={{
         align: 'start',
+        startIndex: initialIndex,
         loop: false,
         breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
       }}
