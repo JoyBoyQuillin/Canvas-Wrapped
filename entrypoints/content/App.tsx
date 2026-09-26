@@ -7,7 +7,6 @@ import { buildSlides, type SlideDef } from '@/components/wrapped/slides';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import type { CarouselApi } from '@/components/ui/carousel';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFullscreen, useIdle, useWrappedData } from './hooks';
 import LoadingScreen from './LoadingScreen';
 import NerdsSheet from './NerdsSheet';
@@ -17,19 +16,32 @@ const RANGE_LABELS: Record<Range, string> = { week: 'Week', month: 'Month', seme
 
 function RangePicker({ value, onChange, dark }: { value: Range; onChange: (r: Range) => void; dark?: boolean }) {
   return (
-    <Tabs value={value} onValueChange={(v) => onChange(v as Range)}>
-      <TabsList className={cn(dark && 'bg-white/10 backdrop-blur')} aria-label="Time range">
+    // Ordinary toggle buttons leave Left/Right available for slide navigation.
+    // Each timeframe remains reachable with Tab and selectable with Enter/Space.
+    <div
+      role="group"
+      aria-label="Time range"
+      className={cn('inline-flex h-9 w-fit items-center rounded-lg p-[3px]', dark ? 'bg-white/10 backdrop-blur' : 'bg-muted')}
+    >
         {RANGES.map((r) => (
-          <TabsTrigger
+          <Button
             key={r}
-            value={r}
-            className={cn('px-3', dark && 'text-white/70 hover:text-white data-[state=active]:bg-white data-[state=active]:text-black')}
+            type="button"
+            variant="ghost"
+            aria-pressed={value === r}
+            onClick={() => onChange(r)}
+            className={cn(
+              'h-full px-3 py-1',
+              dark
+                ? 'text-white/70 hover:bg-white/10 hover:text-white aria-pressed:bg-white aria-pressed:text-black'
+                : 'text-muted-foreground hover:text-foreground aria-pressed:bg-background aria-pressed:text-foreground',
+              value === r && 'shadow-sm',
+            )}
           >
             {RANGE_LABELS[r]}
-          </TabsTrigger>
+          </Button>
         ))}
-      </TabsList>
-    </Tabs>
+    </div>
   );
 }
 
@@ -75,6 +87,7 @@ export default function App() {
       else close();
     } else if (!e.defaultPrevented && !nerds && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
       // The carousel handles arrows itself when focused; this covers focus anywhere else.
+      e.preventDefault();
       if (e.key === 'ArrowRight') api?.scrollNext();
       else api?.scrollPrev();
     }
