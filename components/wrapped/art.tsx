@@ -235,7 +235,7 @@ export function Waffle({ hours }: { hours: number }) {
   const squares = Math.max(1, Math.round(hours / per));
   return (
     <figure className="flex flex-col gap-2">
-      <div className="grid grid-cols-20 gap-1 @4xl/slide:gap-1.5" aria-hidden>
+      <div className="grid w-full max-w-lg grid-cols-20 gap-1 @4xl/slide:gap-1.5" aria-hidden>
         {Array.from({ length: squares }, (_, i) => (
           <div
             key={i}

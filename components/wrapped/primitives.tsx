@@ -46,13 +46,13 @@ export function Slide({
       )}
     >
       <div aria-hidden className="pointer-events-none absolute -right-20 -bottom-24 size-72 rounded-full bg-white/10 blur-2xl @4xl/slide:size-[36rem]" />
-      <CardContent className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col p-8 @4xl/slide:px-16 @4xl/slide:py-24">
+      <CardContent className="wrapped-slide-body relative mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col p-8 @4xl/slide:px-16 @4xl/slide:py-24">
         <p className="text-xs font-semibold tracking-[0.2em] text-white/70 uppercase @4xl/slide:text-sm">{eyebrow}</p>
-        <div className="grid flex-1 items-center gap-10 pt-6 @4xl/slide:grid-cols-[minmax(0,1fr)_auto] @4xl/slide:gap-16">
-          <div className={cn('flex min-w-0 flex-col gap-6 @4xl/slide:gap-8', REVEAL)}>
+        <div className="wrapped-slide-grid grid flex-1 shrink-0 items-center gap-10 pt-6 @4xl/slide:grid-cols-[minmax(0,1fr)_auto] @4xl/slide:gap-16">
+          <div className={cn('wrapped-slide-stack flex min-w-0 flex-col gap-6 @4xl/slide:gap-8', REVEAL)}>
             {children}
             {quip && (
-              <p className="border-l-2 border-white/50 pl-4 text-lg font-medium text-white/90 italic @4xl/slide:text-2xl">
+              <p className="wrapped-slide-quip border-l-2 border-white/50 pl-4 text-lg font-medium text-white/90 italic @4xl/slide:text-2xl">
                 {quip}
               </p>
             )}
@@ -69,23 +69,23 @@ export function Slide({
 }
 
 export function Headline({ children }: { children: ReactNode }) {
-  return <h2 className="text-3xl leading-tight font-bold text-balance @4xl/slide:text-6xl">{children}</h2>;
+  return <h2 className="wrapped-headline text-3xl leading-tight font-bold text-balance @4xl/slide:text-6xl">{children}</h2>;
 }
 
 /** Oversized title for archetype names. */
 export function Title({ children }: { children: ReactNode }) {
-  return <p className="text-5xl leading-[1.05] font-black tracking-tight text-balance @4xl/slide:text-8xl">{children}</p>;
+  return <p className="wrapped-title text-5xl leading-[1.05] font-black tracking-tight text-balance @4xl/slide:text-8xl">{children}</p>;
 }
 
 export function Sub({ children }: { children: ReactNode }) {
-  return <p className="text-base leading-relaxed text-white/80 @4xl/slide:text-2xl">{children}</p>;
+  return <p className="wrapped-sub text-base leading-relaxed text-white/80 @4xl/slide:text-2xl">{children}</p>;
 }
 
 /** The giant number a slide is built around. */
 export function BigStat({ value, unit }: { value: ReactNode; unit?: string }) {
   return (
     <p className="flex flex-wrap items-baseline gap-x-3">
-      <span className="text-7xl leading-none font-black tracking-tight tabular-nums @4xl/slide:text-[10rem]">{value}</span>
+      <span className="wrapped-big-stat min-w-0 wrap-anywhere text-7xl leading-none font-black tracking-tight tabular-nums @4xl/slide:text-[10rem]">{value}</span>
       {unit && <span className="text-2xl font-semibold text-white/80 @4xl/slide:text-4xl">{unit}</span>}
     </p>
   );
