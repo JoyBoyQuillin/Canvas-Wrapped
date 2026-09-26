@@ -2,3 +2,23 @@
 
 /* Shadow-root UI styles. Everything is Tailwind + shadcn; add content-only rules below.
    Avoid at-rule examples in comments: WXT also processes those. */
+
+/* Animations for the Wrapped loading screen and slide art. Use with motion-safe: */
+@theme {
+  --animate-equalizer: equalizer 1.1s ease-in-out infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-twinkle: twinkle 2.4s ease-in-out infinite;
+
+  @keyframes equalizer {
+    0%, 100% { transform: scaleY(0.25); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(24px, -18px) scale(1.08); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+}

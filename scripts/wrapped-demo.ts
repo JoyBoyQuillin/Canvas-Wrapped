@@ -1,8 +1,9 @@
 // Prints a text-only Wrapped from an API-test dump, to check the numbers before building UI.
-// Usage: node scripts/wrapped-demo.ts [path/to/canvas-dump.json]
+// Usage: node scripts/wrapped-demo.ts [path/to/canvas-dump.json] [--range=week|month|semester|all] [--json]
+// Ranges are measured from when the dump was taken, not from today.
 
 import { readFileSync, readdirSync } from 'node:fs';
-import { computeWrapped, type WrappedInput } from '../lib/wrapped.ts';
+import { computeWrapped, RANGES, type Range, type WrappedInput } from '../lib/wrapped.ts';
 import { wrappedSlides } from '../lib/wrapped-slides.ts';
 
 interface DumpResult {
@@ -39,11 +40,14 @@ function inputFromDump(results: DumpResult[]): WrappedInput {
   };
 }
 
-const path = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? latestDump();
-const dump = JSON.parse(readFileSync(path, 'utf8')) as { results: DumpResult[] };
-const stats = computeWrapped(inputFromDump(dump.results));
+const args = process.argv.slice(2);
+const path = args.find((a) => !a.startsWith('--')) ?? latestDump();
+const range = (args.find((a) => a.startsWith('--range='))?.slice(8) ?? 'all') as Range;
+if (!RANGES.includes(range)) throw new Error(`--range must be one of ${RANGES.join(', ')}`);
+const dump = JSON.parse(readFileSync(path, 'utf8')) as { fetchedAt: string; results: DumpResult[] };
+const stats = computeWrapped(inputFromDump(dump.results), range, Date.parse(dump.fetchedAt));
 
-console.log(`(from ${path})\n`);
+console.log(`(from ${path}, range: ${range})\n`);
 wrappedSlides(stats).forEach((lines, i) => {
   console.log(`── Slide ${i + 1} ${'─'.repeat(40)}`);
   console.log(lines.join('\n'), '\n');
