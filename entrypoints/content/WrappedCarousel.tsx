@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures';
 import { cn } from '@/lib/utils';
 import type { SlideDef } from '@/components/wrapped/slides';
 import {
@@ -28,6 +29,8 @@ export default function WrappedCarousel({
   const [initialIndex] = useState(() => Math.min(Math.max(startIndex, 0), Math.max(slides.length - 1, 0)));
   const [current, setCurrent] = useState(initialIndex);
   const immersive = variant === 'immersive';
+  // Two-finger trackpad swipes (horizontal wheel events). 'x' only, so vertical scrolling still scrolls.
+  const [plugins] = useState(() => [WheelGesturesPlugin({ forceWheelAxis: 'x' })]);
   const onIndexChangeRef = useRef(onIndexChange);
   onIndexChangeRef.current = onIndexChange;
 
@@ -92,6 +95,7 @@ export default function WrappedCarousel({
   return (
     <Carousel
       setApi={setApi}
+      plugins={plugins}
       opts={{
         align: 'start',
         startIndex: initialIndex,
