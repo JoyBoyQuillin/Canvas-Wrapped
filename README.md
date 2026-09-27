@@ -1,4 +1,4 @@
-﻿# Canvas Wrapped
+# Canvas Wrapped
 
 **Your Canvas activity, turned into a personal learning recap.**
 
@@ -86,7 +86,7 @@ End users installing a packaged extension do not need Node.js, pnpm, or the deve
 
 Timeframe buttons are keyboard-accessible with Tab and Enter/Space. Escape dismisses an open secondary view or closes Wrapped. Reduced-motion preferences are respected by supported animations.
 
-The primary interface is injected into the Canvas page. The browser-toolbar popup currently contains the original starter interface.
+The primary interface is injected into the Canvas page. The browser-toolbar popup explains how to open your recap from Canvas.
 
 ## What the statistics mean
 
@@ -137,6 +137,19 @@ To inspect a local diagnostic export without opening the UI:
 node scripts/wrapped-demo.ts path/to/canvas-dump.json --range=month
 ```
 
+## Releasing
+
+Update the version in `package.json` before publishing a new release, then create the browser-specific packages:
+
+```bash
+pnpm zip
+pnpm zip:firefox
+```
+
+Use the Chrome extension archive for the Chrome Web Store and the Firefox extension archive for addons.mozilla.org. The Firefox packaging command also creates a sources archive for source-code review. Generated archives are under `.output` and use the package name, version, and target in their filenames.
+
+Keep the Firefox extension ID in `wxt.config.ts` stable across releases. The source archive configuration excludes `fixtures/`, `test_data/`, and Canvas diagnostic dumps; inspect release archives before uploading to ensure no student data is included.
+
 ## Project structure
 
 ```text
@@ -145,8 +158,7 @@ components/
   wrapped/                Slide layouts, artwork, and What's Next UI
 entrypoints/
   content/                Canvas launcher, overlay, carousel, and diagnostics
-  popup/                  Browser-toolbar popup (starter interface)
-  background.ts           Background entrypoint
+  popup/                  Browser-toolbar instructions
 lib/
   canvas-hosts.ts          Supported Canvas URL patterns
   canvas.ts               Canvas API client and pagination
