@@ -1,6 +1,26 @@
-# WXT + React
+# Canvas Wrapped
 
-This template should help get you started developing with React in WXT.
+A Wrapped-style recap of your semester on Canvas: study time, submissions, deadlines, grades
+and more. It's a browser extension (Chrome and Firefox) built with WXT and React; once
+installed, a **Canvas Wrapped** button appears on your school's Canvas pages.
+
+## Development
+
+```bash
+pnpm install
+pnpm dev            # Chrome, rebuilds and reloads on save
+pnpm dev:firefox    # Firefox
+```
+
+## Releasing
+
+Bump `version` in `package.json` (both stores reject a version they've already seen), then:
+
+```bash
+pnpm zip            # .output/canvas-wrapped-<version>-chrome.zip  -> Chrome Web Store
+pnpm zip:firefox    # .output/canvas-wrapped-<version>-firefox.zip -> addons.mozilla.org
+                    # .output/canvas-wrapped-<version>-sources.zip -> AMO's "source code" upload
+```
 
 For adding UI components and understanding the extension's shadow-root styles,
 see the [shadcn setup guide](docs/shadcn-setup.md).

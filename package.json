@@ -1,8 +1,8 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "canvas-wrapped",
+  "description": "A Wrapped-style recap of your semester on Canvas: study time, submissions, deadlines, grades and more. Your data stays local.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
