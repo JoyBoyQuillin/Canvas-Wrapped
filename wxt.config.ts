@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt';
 import tailwindcss from '@tailwindcss/vite';
+import { CANVAS_MATCHES } from './lib/canvas-hosts';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -8,9 +9,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
-    // Intentionally scoped to one school (FIU) for now. To support more schools,
-    // add more domain strings here AND to the `matches` array in entrypoints/content/index.tsx.
-    host_permissions: ['https://fiu.instructure.com/*'],
+    // Schools' Canvas sites; shared with the content script's `matches`.
+    host_permissions: CANVAS_MATCHES,
     // Caches Wrapped data locally so it opens instantly (lib/wrapped-cache.ts).
     permissions: ['storage'],
   },

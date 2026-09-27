@@ -31,7 +31,9 @@ function lines(id: SlideId, w: WrappedStats): string[] {
     case 'intro':
       return [
         `Hey ${w.firstName}, this is your Canvas Wrapped: ${w.rangeLabel}.`,
-        `${w.terms.map((t) => t.label).join(' + ')}${w.dateRange ? ` · ${fmtDate(w.dateRange.from)} – ${fmtDate(w.dateRange.to)}` : ''}`,
+        [w.terms.map((t) => t.label).join(' + '), w.dateRange && `${fmtDate(w.dateRange.from)} – ${fmtDate(w.dateRange.to)}`]
+          .filter(Boolean)
+          .join(' · '),
       ];
     case 'quiet':
       return [`Nothing happened ${period(w)}.`];
