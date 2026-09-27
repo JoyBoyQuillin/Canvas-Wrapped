@@ -1,6 +1,28 @@
-# WXT + React
+# Canvas Wrapped
 
-This template should help get you started developing with React in WXT.
+A Wrapped-style recap of your semester on Canvas: study time, submissions, deadlines, grades
+and more. Once installed, a **Canvas Wrapped** button appears on your school's Canvas pages.
+
+## Install
+
+### Chrome (also Edge, Brave and other Chromium browsers)
+
+1. Download [canvas-wrapped-chrome.zip](release/canvas-wrapped-chrome.zip) and unzip it.
+2. Open `chrome://extensions` and turn on **Developer mode** (top right).
+3. Click **Load unpacked** and select the unzipped folder.
+
+Keep the folder where it is: Chrome loads the extension from it. To update, replace the
+folder's contents with a newer download and click the reload icon on the extension's card.
+
+### Firefox
+
+1. Download [canvas-wrapped-firefox.xpi](release/canvas-wrapped-firefox.xpi).
+2. Open `about:addons`, click the gear icon, choose **Install Add-on From File…**, and select
+   the downloaded file.
+
+The `.xpi` is signed by Mozilla, so it stays installed after Firefox restarts.
+
+## Development
 
 For Firefox:
 
@@ -76,7 +98,7 @@ Diagnostic exports can contain sensitive educational information. Keep real Canv
 | `pnpm zip` | Build and package the Chrome extension. |
 | `pnpm zip:firefox` | Build and package the Firefox extension. |
 
-Generated builds and archives are placed under `.output`. Build artifacts are not committed.
+Generated builds and archives are placed under `.output` and are not committed; only the install downloads in `release/` are.
 
 To inspect a local diagnostic export without opening the UI:
 
@@ -92,6 +114,10 @@ Update the version in `package.json` before publishing a new release, then creat
 pnpm zip
 pnpm zip:firefox
 ```
+
+To update the downloads in the Install section, copy the Chrome archive to
+`release/canvas-wrapped-chrome.zip`, and replace `release/canvas-wrapped-firefox.xpi` with the
+signed `.xpi` that addons.mozilla.org produces for the self-distributed (unlisted) version.
 
 Use the Chrome extension archive for the Chrome Web Store and the Firefox extension archive for addons.mozilla.org. The Firefox packaging command also creates a sources archive for source-code review. Generated archives are under `.output` and use the package name, version, and target in their filenames.
 
