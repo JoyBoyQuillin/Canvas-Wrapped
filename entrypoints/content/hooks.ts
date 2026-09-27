@@ -92,3 +92,53 @@ export function useFullscreen(ref: RefObject<HTMLElement | null>) {
   }, [ref]);
   return { isFullscreen, toggle };
 }
+
+// Canvas's school-branded headers: the global nav on wide windows, the top bar on narrow ones.
+const CANVAS_HEADERS = ['#header', '.ic-app-header', '#mobile-header', '.mobile-header'];
+
+export interface HeaderColors {
+  background: string;
+  foreground: string;
+}
+
+/** Background of whichever Canvas header is showing, or null if none has a solid color. */
+function readHeaderColors(): HeaderColors | null {
+  for (const selector of CANVAS_HEADERS) {
+    const el = document.querySelector<HTMLElement>(selector);
+    if (!el || el.getClientRects().length === 0) continue; // missing or display:none at this size
+    const background = getComputedStyle(el).backgroundColor;
+    const [r, g, b, a = 1] = (background.match(/[\d.]+/g) ?? []).map(Number);
+    if (r === undefined || g === undefined || b === undefined || a === 0) continue;
+    // Relative luminance (sRGB) decides whether white or black text reads better on it.
+    const lin = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    return { background, foreground: luminance > 0.179 ? '#000' : '#fff' };
+  }
+  return null;
+}
+
+/** The school's header colors, re-read on resize since Canvas swaps headers at its breakpoint. */
+export function useCanvasHeaderColors(): HeaderColors | null {
+  const [colors, setColors] = useState(readHeaderColors);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() =>
+        setColors((prev) => {
+          const next = readHeaderColors();
+          return prev?.background === next?.background ? prev : next;
+        }),
+      );
+    };
+    update(); // theme CSS may finish loading after the content script starts
+    window.addEventListener('resize', update);
+    window.addEventListener('load', update);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('load', update);
+    };
+  }, []);
+  return colors;
+}

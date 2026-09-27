@@ -8,7 +8,7 @@ import type { SlideId } from '@/lib/wrapped-copy';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import type { CarouselApi } from '@/components/ui/carousel';
-import { useFullscreen, useIdle, useWrappedData } from './hooks';
+import { useCanvasHeaderColors, useFullscreen, useIdle, useWrappedData } from './hooks';
 import LoadingScreen from './LoadingScreen';
 import NerdsSheet from './NerdsSheet';
 import WrappedCarousel from './WrappedCarousel';
@@ -93,6 +93,7 @@ export default function App() {
 
   const idle = useIdle(rootRef, 2500, open && immersive && !menu && !nerds);
   const fullscreen = useFullscreen(rootRef);
+  const headerColors = useCanvasHeaderColors();
 
   useEffect(() => {
     if (open) rootRef.current?.focus();
@@ -162,8 +163,10 @@ export default function App() {
     <div className="font-sans text-foreground">
       {!open && (
         <Button
-          className="fixed right-4 bottom-4 z-[2147483647] rounded-full shadow-lg"
+          className="fixed right-4 bottom-4 z-[2147483647] rounded-full shadow-lg hover:opacity-90"
           size="lg"
+          // Match the school's branded header so the launcher looks native to each Canvas site.
+          style={headerColors ? { backgroundColor: headerColors.background, color: headerColors.foreground } : undefined}
           onClick={() => {
             setEverOpened(true);
             setOpen(true);
