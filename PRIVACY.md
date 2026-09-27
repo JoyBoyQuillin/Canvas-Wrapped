@@ -1,6 +1,6 @@
 # Privacy Policy — Canvas Wrapped
 
-**Last updated:** [fill in date before publishing]
+**Last updated:** 26/09/26
 
 Canvas Wrapped is a browser extension that generates a personalized,
 Wrapped-style summary of your own Canvas LMS activity — grades, courses,
