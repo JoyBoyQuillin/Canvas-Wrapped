@@ -1,5 +1,5 @@
 // Every student-accessible Canvas endpoint we want to probe for the API test.
-// Some will 401/403 depending on FIU's settings — that's useful to know too.
+// Some will 401/403 depending on the school's settings — that's useful to know too.
 
 import { canvasGet, runPool, type CanvasResponse } from './canvas';
 

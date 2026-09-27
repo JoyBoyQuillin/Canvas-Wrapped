@@ -25,7 +25,7 @@ pnpm install
 pnpm dev
 ```
 
-Open or refresh FIU Canvas in the browser running the development extension.
+Open or refresh your school's Canvas (any site listed in `lib/canvas-hosts.ts`) in the browser running the development extension.
 Check the blue launcher at the bottom-right, hover and keyboard focus, then open
 the panel and check the Wrapped/API tabs. The popup is a separate extension page.
 

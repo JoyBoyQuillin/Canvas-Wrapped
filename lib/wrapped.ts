@@ -149,16 +149,26 @@ const SUBMISSION_TYPE_LABELS: Record<string, string> = {
 const AUTO_SYNC_TYPES = new Set(['external_tool', 'basic_lti_launch']);
 const MIN_REDO_ATTEMPTS = 3; // 2 tries isn't much of a story
 
-// FIU term codes: "1265" = 1 + year 26 + 5 (Summer). 1 = Spring, 5 = Summer, 8 = Fall.
+// Term codes use FIU's format everywhere: "1265" = 1 + year 26 + 5 (Summer), so they sort
+// chronologically. Other schools' "Fall 2026" / "2026 Fall" names are converted to it.
 const FIU_TERM_CODE = /\b1(\d\d)([158])\b/;
-const TERM_SEASONS: Record<string, string> = { '1': 'Spring', '5': 'Summer', '8': 'Fall' };
+const TERM_SEASONS: Record<string, string> = { '0': 'Winter', '1': 'Spring', '5': 'Summer', '8': 'Fall' };
+const SEASON_DIGITS: Record<string, string> = { winter: '0', spring: '1', summer: '5', fall: '8', autumn: '8' };
+const SEASON_YEAR = /\b(winter|spring|summer|fall|autumn)\b\D{0,12}?\b20(\d\d)\b/i;
+const YEAR_SEASON = /\b20(\d\d)\b\W{0,3}(winter|spring|summer|fall|autumn)\b/i;
 const FIU_COURSE_CODE = /\b[A-Z]{3}\d{4}[A-Z]?\b/;
 
 const DAY_MS = 86_400_000;
 const WINDOW_DAYS: Partial<Record<Range, number>> = { week: 7, month: 30 };
 
-function termCode(text: string | undefined): string | null {
-  return text?.match(FIU_TERM_CODE)?.[0] ?? null;
+/** `fiuCodes`: only trust bare codes like "1268" at FIU; elsewhere "MATH 1998" would parse as a term. */
+function termCode(text: string | undefined, fiuCodes: boolean): string | null {
+  if (!text) return null;
+  const sy = text.match(SEASON_YEAR);
+  if (sy) return `1${sy[2]}${SEASON_DIGITS[sy[1]!.toLowerCase()]}`;
+  const ys = text.match(YEAR_SEASON);
+  if (ys) return `1${ys[1]}${SEASON_DIGITS[ys[2]!.toLowerCase()]}`;
+  return fiuCodes ? (text.match(FIU_TERM_CODE)?.[0] ?? null) : null;
 }
 
 function termLabel(code: string): string {
@@ -215,6 +225,8 @@ interface CourseInfo {
 
 function courseInfo(input: WrappedInput): Map<number, CourseInfo> {
   const context = contextNames(input);
+  // FIU's term names start with the code ("1268 - Fall 2026").
+  const fiuCodes = input.courses.some((c) => /^1\d\d[158]\b/.test(c.term?.name ?? ''));
   const ids = new Set([...input.courses.map((c) => c.id), ...input.enrollments.map((e) => e.course_id)]);
   const infos = new Map<number, CourseInfo>();
   for (const id of ids) {
@@ -223,11 +235,13 @@ function courseInfo(input: WrappedInput): Map<number, CourseInfo> {
     const code = texts.map((t) => t.match(FIU_COURSE_CODE)?.[0]).find(Boolean);
     // FIU puts the readable title ("Python Programming I") in either field; the other holds
     // an SIS string like "COP2047 U02 1268" or "1268 - ENC3249 - ... - Sections RVD & RVF - Fall 2026".
-    const title = texts.find((t) => t.length <= 40 && !FIU_COURSE_CODE.test(t) && !FIU_TERM_CODE.test(t));
+    const title = texts.find(
+      (t) => t.length <= 40 && !FIU_COURSE_CODE.test(t) && !(fiuCodes && FIU_TERM_CODE.test(t)),
+    );
     infos.set(id, {
       id,
-      label: title && code ? `${code} ${title}` : title ?? code ?? `Course #${id}`,
-      termCode: termCode(course?.term?.name) ?? texts.map(termCode).find(Boolean) ?? null,
+      label: title && code ? `${code} ${title}` : title ?? code ?? texts[0] ?? `Course #${id}`,
+      termCode: [course?.term?.name, ...texts].map((t) => termCode(t, fiuCodes)).find(Boolean) ?? null,
       restricted: !!course?.access_restricted_by_date,
       hasActivity: !!input.activity[id],
     });
@@ -268,7 +282,8 @@ export function computeWrapped(input: WrappedInput, range: Range = 'all', now: n
   const inView = (id: number): boolean => {
     const info = infos.get(id);
     if (range === 'all') return true;
-    if (range === 'semester') return !!semester && info?.termCode === semester.code;
+    // No recognizable term names at all: fall back to the courses that are still open.
+    if (range === 'semester') return semester ? info?.termCode === semester.code : !info?.restricted;
     return info?.termCode ? completeCodes.has(info.termCode) : !info?.restricted;
   };
   const windowDays = WINDOW_DAYS[range];

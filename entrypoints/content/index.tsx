@@ -1,12 +1,12 @@
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { prefetchWrapped } from '@/lib/wrapped-cache';
+import { CANVAS_MATCHES } from '@/lib/canvas-hosts';
 import styles from './style.css?inline';
 
 export default defineContentScript({
-  // Intentionally scoped to one school (FIU) for now. To support more schools,
-  // add more domain strings here AND to `host_permissions` in wxt.config.ts.
-  matches: ['https://fiu.instructure.com/*'],
+  // Schools' Canvas sites; shared with `host_permissions` in wxt.config.ts.
+  matches: CANVAS_MATCHES,
 
   async main(ctx) {
     // Warm the cache in the background so Wrapped opens instantly.
