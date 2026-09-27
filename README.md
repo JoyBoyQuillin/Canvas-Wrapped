@@ -1,59 +1,6 @@
-# Canvas Wrapped
+# WXT + React
 
-**Your Canvas activity, turned into a personal learning recap.**
-
-Canvas Wrapped is a browser extension that transforms Canvas LMS activity into an interactive slide carousel. Explore your course activity, submissions, deadline habits, grades, and study patterns, then turn those insights into a copyable prompt for a learning plan and free study resources.
-
-Built with **WXT, React, TypeScript, Tailwind CSS, shadcn/ui, and Embla Carousel**.
-
-Inspired by Spotify Wrapped, with the same personal recap idea applied to your learning activity in Canvas.
-
-## TL;DR
-
-Canvas Wrapped turns your Canvas stats into an interactive recap of your courses, grades, submissions, and study habits. It also creates a copyable prompt for personalized learning plans and free study resources using an AI of your choice.
-
-To try it locally, run `pnpm install` and `pnpm dev`, sign in to a supported Canvas site in the development browser, and click **Canvas Wrapped**. Data is processed and cached locally; AI sharing happens only when you submit the copied prompt yourself.
-
-## Features
-
-- **Personalized recap:** animated slides covering time in Canvas, page views, top courses, submissions, grades, and more, depending on the available data.
-- **Multiple timeframes:** switch between Week, Month, Semester, and All time.
-- **Flexible viewing:** immersive presentation, browser fullscreen, and a smaller panel with Canvas visible behind it.
-- **Carousel navigation:** arrow buttons, keyboard arrows, drag/swipe, and clickable slide progress indicators.
-- **Study and deadline patterns:** descriptive archetypes based on the activity and submission data Canvas provides.
-- **What's Next:** a read-only, copyable prompt asking your preferred AI for a personalized two-week learning plan and course-specific resources, with an emphasis on free options.
-- **Stats for nerds:** inspect the data behind a slide, view aggregated stats, and run Canvas API diagnostics.
-- **Local caching:** reuse fetched data to make subsequent visits faster.
-
-## Supported Canvas sites
-
-The extension is configured for `https://*.instructure.com/*`, including FIU Canvas, plus selected custom Canvas domains such as UCF, FSU, FAU, and others.
-
-The source of truth is [`lib/canvas-hosts.ts`](lib/canvas-hosts.ts). Both the extension permissions and content-script matching use this list. To support another custom domain, add its HTTPS match pattern there and rebuild.
-
-A matching domain does not guarantee that every statistic is available. Schools can restrict endpoints, historical courses, and analytics access.
-
-## Getting started
-
-### Prerequisites
-
-- Node.js 22.18+ with native TypeScript execution support, or a newer compatible release.
-- pnpm.
-- Chrome/Chromium or Firefox for development.
-- An authenticated student session on a supported Canvas site.
-
-No Canvas API token, AI API key, or separate backend is required.
-
-### Install and run
-
-From the repository directory containing `package.json`:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Installation also runs `wxt prepare` to generate WXT's development files. Open your school's Canvas site in the development browser and sign in normally.
+This template should help get you started developing with React in WXT.
 
 For Firefox:
 
