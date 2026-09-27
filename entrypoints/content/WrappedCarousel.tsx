@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import { forwardWheelWithMomentum } from './firefox-wheel';
 
 interface Props {
   slides: SlideDef[];
@@ -30,7 +31,15 @@ export default function WrappedCarousel({
   const [current, setCurrent] = useState(initialIndex);
   const immersive = variant === 'immersive';
   // Two-finger trackpad swipes (horizontal wheel events). 'x' only, so vertical scrolling still scrolls.
-  const [plugins] = useState(() => [WheelGesturesPlugin({ forceWheelAxis: 'x' })]);
+  // Firefox build only: the plugin listens on a detached proxy element and we forward wheel events
+  // to it with a momentum flag (see firefox-wheel.ts). Chrome uses the plugin's defaults.
+  const [wheelProxy] = useState(() => (import.meta.env.FIREFOX ? document.createElement('div') : null));
+  const [plugins] = useState(() => [
+    WheelGesturesPlugin({ forceWheelAxis: 'x', ...(wheelProxy && { target: wheelProxy }) }),
+  ]);
+  // Checked here instead of via Embla's `breakpoints` option: Embla calls matchMedia unbound
+  // for breakpoints, which throws inside Firefox content scripts and crashes the carousel.
+  const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const onIndexChangeRef = useRef(onIndexChange);
   onIndexChangeRef.current = onIndexChange;
 
@@ -52,6 +61,9 @@ export default function WrappedCarousel({
       api.off('reInit', updateCurrent);
     };
   }, [api, onApi]);
+
+  useEffect(() => (api && wheelProxy ? forwardWheelWithMomentum(api.rootNode(), wheelProxy) : undefined), [api, wheelProxy]);
+
 
   if (!slides.length) return null;
 
@@ -100,7 +112,7 @@ export default function WrappedCarousel({
         align: 'start',
         startIndex: initialIndex,
         loop: false,
-        breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
+        ...(reducedMotion && { duration: 0 }),
       }}
       className={cn(
         'w-full min-w-0 outline-none',
