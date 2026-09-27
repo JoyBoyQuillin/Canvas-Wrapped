@@ -133,6 +133,7 @@ export default function WrappedCarousel({
             data-active={index === current}
             aria-label={`${index + 1} of ${slides.length}: ${slide.title}`}
             aria-hidden={index !== current}
+            inert={index !== current}
           >
             <div className={cn('w-full min-w-0', immersive && 'h-full min-h-0')} onContextMenu={onSlideContextMenu && ((e) => onSlideContextMenu(e, slide))}>
               {slide.content}

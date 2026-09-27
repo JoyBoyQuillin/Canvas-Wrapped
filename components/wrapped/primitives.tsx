@@ -36,8 +36,8 @@ const REVEAL_ART =
  * immersive-sized (≥ 56rem wide), so the same slide works in the small panel and full screen.
  */
 export function Slide({
-  theme, eyebrow, art, quip, children,
-}: { theme: Theme; eyebrow: string; art?: ReactNode; quip?: string; children: ReactNode }) {
+  theme, eyebrow, art, showArtOnSmall = false, quip, children, footer,
+}: { theme: Theme; eyebrow: string; art?: ReactNode; showArtOnSmall?: boolean; quip?: string; children: ReactNode; footer?: ReactNode }) {
   return (
     <Card
       className={cn(
@@ -58,11 +58,12 @@ export function Slide({
             )}
           </div>
           {art && (
-            <div aria-hidden className={cn('hidden items-center justify-center @4xl/slide:flex', REVEAL_ART)}>
+            <div aria-hidden className={cn('min-w-0 items-center justify-center @4xl/slide:flex', showArtOnSmall ? 'flex' : 'hidden', REVEAL_ART)}>
               {art}
             </div>
           )}
         </div>
+        {footer && <div className="mt-6 flex shrink-0 justify-end">{footer}</div>}
       </CardContent>
     </Card>
   );

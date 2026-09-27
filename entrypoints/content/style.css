@@ -5,6 +5,37 @@
 
 /* Animations for the Wrapped loading screen and slide art. Use with motion-safe: */
 /* Measure the actual carousel height, including when browser fullscreen changes. */
+.wrapped-scrollbar,
+.wrapped-slide-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--wrapped-scroll-thumb, #94a3b8) transparent;
+}
+
+.wrapped-slide-body {
+  --wrapped-scroll-thumb: rgb(255 255 255 / 0.35);
+}
+
+.wrapped-scrollbar::-webkit-scrollbar,
+.wrapped-slide-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.wrapped-scrollbar::-webkit-scrollbar-track,
+.wrapped-slide-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wrapped-scrollbar::-webkit-scrollbar-thumb,
+.wrapped-slide-body::-webkit-scrollbar-thumb {
+  background: var(--wrapped-scroll-thumb, #94a3b8);
+  border-radius: 999px;
+}
+
+.wrapped-prompt-preview {
+  --wrapped-scroll-thumb: #94a3b8;
+}
+
 .wrapped-immersive {
   container: wrapped-viewport / size;
 }

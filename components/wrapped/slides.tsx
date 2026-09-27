@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import WhatsNext from './WhatsNext';
 import { cn } from '@/lib/utils';
 import { CLOCK_ARCHETYPES, DEADLINE_ARCHETYPES } from '@/lib/archetypes';
 import { DAYS, type WrappedStats } from '@/lib/wrapped';
@@ -67,7 +68,13 @@ export function buildSlides(w: WrappedStats): SlideDef[] {
       title: 'Welcome',
       data: { range: w.range, terms: w.terms, dateRange: w.dateRange },
       content: (
-        <Slide theme="violet" eyebrow={`Canvas Wrapped · ${w.rangeLabel}`} art={<LiveBars />} quip={q('intro')}>
+        <Slide
+          theme="violet"
+          eyebrow={`Canvas Wrapped · ${w.rangeLabel}`}
+          showArtOnSmall
+          art={<LiveBars className="h-24 w-full max-w-72 @4xl/slide:h-44 @4xl/slide:w-72" />}
+          quip={q('intro')}
+        >
           <p className="text-lg font-medium text-white/80 @4xl/slide:text-3xl">Hey {w.firstName},</p>
           <h2 className="text-5xl leading-[1.05] font-black tracking-tight @4xl/slide:text-9xl">
             {w.range === 'week' ? 'Your week,' : w.range === 'month' ? 'Your month,' : w.range === 'semester' ? 'Your semester,' : 'Your Canvas,'}
@@ -85,7 +92,7 @@ export function buildSlides(w: WrappedStats): SlideDef[] {
       title: 'A quiet stretch',
       data: { range: w.range },
       content: (
-        <Slide theme="night" eyebrow="Nothing to report" art={<QuietArt />} quip={q('quiet')}>
+        <Slide theme="night" eyebrow="Nothing to report" art={<QuietArt />} quip={q('quiet')} footer={<WhatsNext stats={w} />}>
           <Title>A quiet {w.range === 'week' ? 'week' : 'stretch'}.</Title>
           <Sub>No submissions or Canvas activity {period(w)}. Try a longer view up top.</Sub>
         </Slide>
@@ -260,7 +267,7 @@ export function buildSlides(w: WrappedStats): SlideDef[] {
       title: 'Recap',
       data: w,
       content: (
-        <Slide theme="finale" eyebrow={`Your Wrapped · ${w.rangeLabel}`} quip={q('recap')}>
+        <Slide theme="finale" eyebrow={`Your Wrapped · ${w.rangeLabel}`} quip={q('recap')} footer={<WhatsNext stats={w} />}>
           <Headline>That's a wrap, {w.firstName}.</Headline>
           <div className="grid grid-cols-2 gap-3 @xl/slide:grid-cols-3 @4xl/slide:gap-4">
             {w.totalHours !== null

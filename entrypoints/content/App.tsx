@@ -123,6 +123,19 @@ export default function App() {
     setNerds(null);
   }, []);
 
+  async function shrinkToPanel() {
+    // A fullscreen element has its own backdrop; leave fullscreen before showing Canvas behind the panel.
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch (error) {
+        console.error('Could not exit fullscreen to show the Wrapped panel.', error);
+        return;
+      }
+    }
+    setMode('panel');
+  }
+
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === 'Escape') {
       if (menu) setMenu(null);
@@ -183,9 +196,10 @@ export default function App() {
           onKeyDown={onKeyDown}
           className={cn(
             'fixed inset-0 z-[2147483647] outline-none',
-            !open && 'hidden',
             immersive ? 'bg-black' : 'flex items-center justify-center bg-black/60 p-4',
             immersive && idle && 'cursor-none',
+            // Keep this last: cn() otherwise lets panel mode's `flex` replace `hidden`.
+            !open && 'hidden',
           )}
           onClick={(e) => !immersive && e.target === e.currentTarget && close()}
         >
@@ -216,7 +230,7 @@ export default function App() {
                   {[
                     { label: 'Refresh data', icon: RotateCw, onClick: data.refresh, spin: data.refreshing },
                     { label: fullscreen.isFullscreen ? 'Exit full screen' : 'Full screen', icon: fullscreen.isFullscreen ? Minimize : Maximize, onClick: fullscreen.toggle },
-                    { label: 'Shrink to window', icon: Minimize2, onClick: () => setMode('panel') },
+                    { label: 'Shrink to window', icon: Minimize2, onClick: shrinkToPanel },
                     { label: 'Close', icon: X, onClick: close },
                   ].map(({ label, icon: Icon, onClick, spin }) => (
                     <Button
@@ -262,7 +276,7 @@ export default function App() {
                   </Button>
                 </div>
               </header>
-              <div className="min-h-0 overflow-y-auto p-4">
+              <div className="wrapped-scrollbar min-h-0 overflow-y-auto p-4">
                 {body ?? (
                   <>
                     <WrappedCarousel
