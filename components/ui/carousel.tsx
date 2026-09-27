@@ -75,6 +75,8 @@ function Carousel({
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement
+      if (target.isContentEditable || target.closest('input, textarea, select')) return
       if (event.key === "ArrowLeft") {
         event.preventDefault()
         scrollPrev()
