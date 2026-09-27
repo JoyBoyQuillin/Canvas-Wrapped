@@ -7,7 +7,7 @@ and more. Once installed, a **Canvas Wrapped** button appears on your school's C
 
 ### Chrome (also Edge, Brave and other Chromium browsers)
 
-1. Download [canvas-wrapped-chrome.zip](release/canvas-wrapped-chrome.zip) and unzip it.
+1. Download [canvas-wrapped-chrome.zip](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/download/v1.0.0/canvas-wrapped-1.0.0-chrome.zip) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode** (top right).
 3. Click **Load unpacked** and select the unzipped folder.
 
