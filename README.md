@@ -16,7 +16,7 @@ folder's contents with a newer download and click the reload icon on the extensi
 
 ### Firefox
 
-1. Download [canvas-wrapped-firefox.xpi](release/canvas-wrapped-firefox.xpi).
+1. Download [canvas-wrapped-firefox.xpi](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/download/v1.0.0/canvas-wrapped-1.0.0-firefox.xpi).
 2. Open `about:addons`, click the gear icon, choose **Install Add-on From File…**, and select
    the downloaded file.
 
