@@ -4,7 +4,6 @@ import type { SlideDef } from '@/components/wrapped/slides';
 import type { WrappedStats } from '@/lib/wrapped';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ApiTest from './ApiTest';
 
 function JsonBlock({ value }: { value: unknown }) {
   const [copied, setCopied] = useState(false);
@@ -49,7 +48,6 @@ export default function NerdsSheet({
           <TabsList>
             {slide && <TabsTrigger value="slide">This slide</TabsTrigger>}
             <TabsTrigger value="all">All stats</TabsTrigger>
-            <TabsTrigger value="api">API test</TabsTrigger>
           </TabsList>
           {slide && (
             <TabsContent value="slide" className="flex min-h-0 flex-col gap-2">
@@ -59,9 +57,6 @@ export default function NerdsSheet({
           )}
           <TabsContent value="all" className="flex min-h-0 flex-col">
             <JsonBlock value={stats} />
-          </TabsContent>
-          <TabsContent value="api" className="min-h-0 overflow-y-auto">
-            <ApiTest />
           </TabsContent>
         </Tabs>
       </aside>
