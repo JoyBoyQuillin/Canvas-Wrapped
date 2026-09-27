@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { AlertCircle, BarChart3, Maximize, Maximize2, Minimize, Minimize2, RotateCw, Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { browser } from 'wxt/browser';
+import DataDisclosure from './DataDisclosure';
 import { computeWrapped, RANGES, type Range } from '@/lib/wrapped';
 import { timeAgo } from '@/lib/wrapped-slides';
 import { buildSlides, type SlideDef } from '@/components/wrapped/slides';
@@ -26,6 +28,7 @@ function resolveIndex(slides: SlideDef[], at: { id: SlideId; index: number }): n
 }
 
 const RANGE_LABELS: Record<Range, string> = { week: 'Week', month: 'Month', semester: 'Semester', all: 'All time' };
+const DISCLOSURE_KEY = 'wrapped:data-disclosure:v1';
 
 function RangePicker({ value, onChange, dark }: { value: Range; onChange: (r: Range) => void; dark?: boolean }) {
   return (
@@ -65,6 +68,12 @@ function RangePicker({ value, onChange, dark }: { value: Range; onChange: (r: Ra
  */
 export default function App() {
   const [open, setOpen] = useState(false);
+  const [showDisclosure, setShowDisclosure] = useState(false);
+  const [checkingDisclosure, setCheckingDisclosure] = useState(false);
+  const disclosureSeen = useRef(false);
+  const checkingDisclosureRef = useRef(false);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const previouslyShowingDisclosure = useRef(false);
   const [everOpened, setEverOpened] = useState(false);
   const [mode, setMode] = useState<'immersive' | 'panel'>('immersive');
   const [range, setRange] = useState<Range>('semester');
@@ -72,6 +81,42 @@ export default function App() {
   const [nerds, setNerds] = useState<{ slide: SlideDef | null } | null>(null);
   const [api, setApi] = useState<CarouselApi>();
   const rootRef = useRef<HTMLDivElement>(null);
+
+  function openWrapped() {
+    setEverOpened(true);
+    setOpen(true);
+  }
+
+  async function openFromLauncher() {
+    if (checkingDisclosureRef.current) return;
+    checkingDisclosureRef.current = true;
+    setCheckingDisclosure(true);
+    try {
+      if (!disclosureSeen.current) {
+        const saved = await browser.storage.local.get(DISCLOSURE_KEY);
+        disclosureSeen.current = saved[DISCLOSURE_KEY] === true;
+      }
+      if (disclosureSeen.current) openWrapped();
+      else setShowDisclosure(true);
+    } catch {
+      setShowDisclosure(true);
+    } finally {
+      checkingDisclosureRef.current = false;
+      setCheckingDisclosure(false);
+    }
+  }
+
+  function acknowledgeDisclosure() {
+    disclosureSeen.current = true;
+    void browser.storage.local.set({ [DISCLOSURE_KEY]: true }).catch(() => {});
+    setShowDisclosure(false);
+    openWrapped();
+  }
+
+  useEffect(() => {
+    if (previouslyShowingDisclosure.current && !showDisclosure && !open) launcherRef.current?.focus();
+    previouslyShowingDisclosure.current = showDisclosure;
+  }, [showDisclosure, open]);
 
   const data = useWrappedData(everOpened);
   const stats = useMemo(() => (data.entry ? computeWrapped(data.entry.input, range) : null), [data.entry, range]);
@@ -174,20 +219,21 @@ export default function App() {
 
   return (
     <div className="font-sans text-foreground">
-      {!open && (
+      {!open && !showDisclosure && (
         <Button
+          ref={launcherRef}
+          disabled={checkingDisclosure}
           className="fixed right-4 bottom-4 z-[2147483647] rounded-full shadow-lg hover:opacity-90"
           size="lg"
           // Match the school's branded header so the launcher looks native to each Canvas site.
           style={headerColors ? { backgroundColor: headerColors.background, color: headerColors.foreground } : undefined}
-          onClick={() => {
-            setEverOpened(true);
-            setOpen(true);
-          }}
+          onClick={openFromLauncher}
         >
           <Sparkles /> Canvas Wrapped
         </Button>
       )}
+
+      {showDisclosure && <DataDisclosure onContinue={acknowledgeDisclosure} onClose={() => setShowDisclosure(false)} />}
 
       {everOpened && (
         <div
