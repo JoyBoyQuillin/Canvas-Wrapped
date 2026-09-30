@@ -1,22 +1,34 @@
 # Canvas Wrapped
 
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Get%20the%20Extension-4285F4?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/canvas-wrapped/fhklgoljbphbeciedbeblnaljhalelpe)
+[![Firefox Add-on](https://img.shields.io/badge/Firefox-Get%20the%20Add--on-ff7118?logo=firefox-browser&logoColor=white)](https://addons.mozilla.org/firefox/addon/canvas-wrapped/)
+
 A Wrapped-style recap of your semester on Canvas: study time, submissions, deadlines, grades
 and more. Once installed, a **Canvas Wrapped** button appears on your school's Canvas pages.
 
 ## Install
 
-### Chrome (also Edge, Brave and other Chromium browsers)
+<p align="left">
+  <a href="https://chromewebstore.google.com/detail/canvas-wrapped/fhklgoljbphbeciedbeblnaljhalelpe"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" alt="Available in the Chrome Web Store" height="60"/></a>
+  <a href="https://addons.mozilla.org/firefox/addon/canvas-wrapped/"><img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get the add-on for Firefox" height="60"/></a>
+</p>
 
-1. Download [canvas-wrapped-chrome.zip](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/download/v1.0.0/canvas-wrapped-1.0.0-chrome.zip) and unzip it.
+The Chrome Web Store version also works in Edge, Brave and other Chromium browsers.
+
+### Manual install
+
+#### Chrome (also Edge, Brave and other Chromium browsers)
+
+1. Download [canvas-wrapped-chrome.zip](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/latest/download/canvas-wrapped-chrome.zip) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode** (top right).
 3. Click **Load unpacked** and select the unzipped folder.
 
 Keep the folder where it is: Chrome loads the extension from it. To update, replace the
 folder's contents with a newer download and click the reload icon on the extension's card.
 
-### Firefox
+#### Firefox
 
-1. Download [canvas-wrapped-firefox.xpi](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/download/v1.0.0/canvas-wrapped-1.0.0-firefox.xpi).
+1. Download [canvas-wrapped-firefox.xpi](https://github.com/JoyBoyQuillin/Canvas-Wrapped/releases/latest/download/canvas-wrapped-firefox.xpi).
 2. Open `about:addons`, click the gear icon, choose **Install Add-on From File…**, and select
    the downloaded file.
 
@@ -98,7 +110,7 @@ Diagnostic exports can contain sensitive educational information. Keep real Canv
 | `pnpm zip` | Build and package the Chrome extension. |
 | `pnpm zip:firefox` | Build and package the Firefox extension. |
 
-Generated builds and archives are placed under `.output` and are not committed; only the install downloads in `release/` are.
+Generated builds and archives are placed under `.output` and are not committed.
 
 To inspect a local diagnostic export without opening the UI:
 
@@ -115,9 +127,13 @@ pnpm zip
 pnpm zip:firefox
 ```
 
-To update the downloads in the Install section, copy the Chrome archive to
-`release/canvas-wrapped-chrome.zip`, and replace `release/canvas-wrapped-firefox.xpi` with the
-signed `.xpi` that addons.mozilla.org produces for the self-distributed (unlisted) version.
+The manual downloads in the Install section always point to the latest GitHub release, so the
+README doesn't need editing. Create a GitHub release and attach these two files, named exactly
+like this every time:
+
+- `canvas-wrapped-chrome.zip`: the Chrome archive.
+- `canvas-wrapped-firefox.xpi`: the `.xpi` signed by addons.mozilla.org. The unsigned archive
+  from `.output` can't be installed permanently in Firefox.
 
 Use the Chrome extension archive for the Chrome Web Store and the Firefox extension archive for addons.mozilla.org. The Firefox packaging command also creates a sources archive for source-code review. Generated archives are under `.output` and use the package name, version, and target in their filenames.
 
